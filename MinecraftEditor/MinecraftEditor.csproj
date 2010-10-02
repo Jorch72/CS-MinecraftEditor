@@ -1,0 +1,72 @@
+﻿<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{1F3A1A0D-E5F2-48C8-B9B7-5F80294F990C}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MinecraftEditor</RootNamespace>
+    <AssemblyName>MinecraftEditor</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SourceAnalysisOverrideSettingsFile>C:\Dokumente und Einstellungen\copyboy\Anwendungsdaten\ICSharpCode/SharpDevelop3.0\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>Full</DebugType>
+    <Optimize>False</Optimize>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <DebugSymbols>False</DebugSymbols>
+    <DebugType>None</DebugType>
+    <Optimize>True</Optimize>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
+  <ItemGroup>
+    <Reference Include="NBT">
+      <HintPath>NBT.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK">
+      <HintPath>OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Graphics\BlendMode.cs" />
+    <Compile Include="Graphics\Camera.cs" />
+    <Compile Include="Graphics\Display.cs" />
+    <Compile Include="Graphics\DisplayList.cs" />
+    <Compile Include="Graphics\Draw.cs" />
+    <Compile Include="Graphics\FrameBuffer.cs" />
+    <Compile Include="Graphics\Texture.cs" />
+    <Compile Include="Minecraft\BlockRenderer.cs" />
+    <Compile Include="Minecraft\Blocktype.cs" />
+    <Compile Include="Minecraft\BlocktypeInfo.cs" />
+    <Compile Include="Minecraft\Chunk.cs" />
+    <Compile Include="Minecraft\DrawMode.cs" />
+    <Compile Include="Minecraft\World.cs" />
+    <Compile Include="Platform.cs" />
+    <Compile Include="PointS.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Ressources.cs" />
+    <Compile Include="Side.cs" />
+    <Compile Include="Window.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Graphics" />
+    <Folder Include="Minecraft" />
+  </ItemGroup>
+</Project>
