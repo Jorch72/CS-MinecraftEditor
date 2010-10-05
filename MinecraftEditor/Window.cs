@@ -11,18 +11,26 @@ namespace MinecraftEditor
 {
 	public class Window : GameWindow
 	{
+		public bool Fog { get; set; }
+		public bool Grid { get; set; }
+		public Font Font { get; set; }
+		
 		public Camera Camera { get; private set; }
 		public World World { get; private set; }
 		
 		public Window() : base(1152, 864, new GraphicsMode(32, 24, 0, 0), "Minecraft Editor")
 		{
 			WindowBorder = WindowBorder.Fixed;
-			if (!Ressources.Load()) Exit();
+			
+			Fog = true;
+			Grid = true;
 			
 			World = new World();
 			Camera = new Camera(){
 				Location = new Vector3d(0.0, 48.0 - World.RenderRange, 0.0),
 				Rotation = new Vector3(0, 90, 0) };
+			
+			Keyboard.KeyDown += KeyDown;
 		}
 		
 		protected override void OnLoad(EventArgs e)
@@ -40,13 +48,15 @@ namespace MinecraftEditor
 			GL.ColorMaterial(MaterialFace.Front,
 			                 ColorMaterialParameter.AmbientAndDiffuse);
 			
-			GL.Enable(EnableCap.AlphaTest);
 			GL.AlphaFunc(AlphaFunction.Greater, 0.1f);
 			
 			GL.Fog(FogParameter.FogMode, (int)FogMode.Linear);
 			GL.Fog(FogParameter.FogColor, new float[]{ 0.0f, 0.0f, 0.0f, 1.0f });
 			GL.Fog(FogParameter.FogStart, (World.RenderRange - 48.0f) * 0.75f);
 			GL.Fog(FogParameter.FogEnd, World.RenderRange - 48.0f);
+			
+			if (!Ressources.Load()) Exit();
+			Font = new Font(Ressources.FontTexture);
 		}
 		
 		protected override void OnResize(EventArgs e)
@@ -56,8 +66,28 @@ namespace MinecraftEditor
 		
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
-			if (Keyboard[Key.Escape]) Exit();
 			Camera.Update(this, e.Time);
+		}
+		
+		void KeyDown(object sender, KeyboardKeyEventArgs e)
+		{
+			switch (e.Key)
+			{
+				case Key.Escape:
+					Exit(); break;
+				case Key.F:
+					Fog = !Fog; break;
+				case Key.G:
+					Grid = !Grid; break;
+				case Key.F5:
+					if(World.Light > 0) --World.Light; break;
+				case Key.F6:
+					if (World.Light < 15) ++World.Light; break;
+				case Key.F7:
+					if (World.MinimumLight > 0) --World.MinimumLight; break;
+				case Key.F8:
+					if (World.MinimumLight < 15) ++World.MinimumLight; break;
+			}
 		}
 		
 		protected override void OnRenderFrame(FrameEventArgs e)
@@ -66,7 +96,7 @@ namespace MinecraftEditor
 			
 			GL.MatrixMode(MatrixMode.Projection);
 			Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(
-				(float)Math.PI/4, (float)Width/Height, 0.2f, World.RenderRange);
+				(float)Math.PI/4, (float)Width/Height, 0.2f, 1024.0f);
 			GL.LoadMatrix(ref projection);
 			GL.MatrixMode(MatrixMode.Modelview);
 			GL.LoadIdentity();
@@ -74,7 +104,8 @@ namespace MinecraftEditor
 			GL.Enable(EnableCap.DepthTest);
 			GL.Enable(EnableCap.CullFace);
 			GL.Enable(EnableCap.Lighting);
-			GL.Enable(EnableCap.Fog);
+			GL.Enable(EnableCap.AlphaTest);
+			if (Fog) GL.Enable(EnableCap.Fog);
 			
 			Camera.Render();
 			GL.Light(LightName.Light0, LightParameter.Position, new Vector4(0.5f, 1.0f, 0.7f, 0.0f));
@@ -88,19 +119,21 @@ namespace MinecraftEditor
 			Display.Texture = null;
 			Display.BlendMode = BlendMode.Add;
 			GL.LineWidth(2.0f);
-			GL.Color4(new Color4(1.0f, 1.0f, 1.0f, 0.3f));
-			GL.Begin(BeginMode.Lines);
-			for (int x = (int)Math.Floor((-Camera.X + Chunk.Width / 2 - World.RenderRange) / 16.0);
-			     x < (int)Math.Ceiling((-Camera.X + Chunk.Width / 2  + World.RenderRange) / 16.0); x++) {
-				GL.Vertex3(x * 16, Chunk.Depth, -Camera.Z + Chunk.Height / 2 - World.RenderRange);
-				GL.Vertex3(x * 16, Chunk.Depth, -Camera.Z + Chunk.Height / 2 + World.RenderRange);
+			if (Grid) {
+				GL.Color4(new Color4(1.0f, 1.0f, 1.0f, 0.3f));
+				GL.Begin(BeginMode.Lines);
+				for (int x = (int)Math.Floor((-Camera.X + Chunk.Width / 2 - World.RenderRange) / 16.0);
+				     x < (int)Math.Ceiling((-Camera.X + Chunk.Width / 2  + World.RenderRange) / 16.0); x++) {
+					GL.Vertex3(x * 16, Chunk.Depth, Math.Floor((-Camera.Z + Chunk.Height / 2 - World.RenderRange) / 16.0) * 16.0);
+					GL.Vertex3(x * 16, Chunk.Depth, Math.Floor((-Camera.Z + Chunk.Height / 2 + World.RenderRange) / 16.0) * 16.0);
+				}
+				for (int z = (int)Math.Floor((-Camera.Z + Chunk.Height / 2 - World.RenderRange) / 16.0);
+				     z < (int)Math.Ceiling((-Camera.Z + Chunk.Height / 2  + World.RenderRange) / 16.0); z++) {
+					GL.Vertex3(Math.Floor((-Camera.X + Chunk.Height / 2 - World.RenderRange) / 16.0) * 16.0, Chunk.Depth, z * 16);
+					GL.Vertex3(Math.Floor((-Camera.X + Chunk.Height / 2 + World.RenderRange) / 16.0) * 16.0, Chunk.Depth, z * 16);
+				}
+				GL.End();
 			}
-			for (int z = (int)Math.Floor((-Camera.Z + Chunk.Height / 2 - World.RenderRange) / 16.0);
-			     z < (int)Math.Ceiling((-Camera.Z + Chunk.Height / 2  + World.RenderRange) / 16.0); z++) {
-				GL.Vertex3(-Camera.X + Chunk.Height / 2 - World.RenderRange, Chunk.Depth, z * 16);
-				GL.Vertex3(-Camera.X + Chunk.Height / 2 + World.RenderRange, Chunk.Depth, z * 16);
-			}
-			GL.End();
 			
 			Select();
 			Display.BlendMode = BlendMode.None;
@@ -113,7 +146,8 @@ namespace MinecraftEditor
 			
 			GL.Disable(EnableCap.DepthTest);
 			GL.Disable(EnableCap.CullFace);
-			GL.Disable(EnableCap.Fog);
+			GL.Disable(EnableCap.AlphaTest);
+			if (Fog) GL.Disable(EnableCap.Fog);
 			
 			if (Camera.MouseEnabled) {
 				GL.LineWidth(1.0f);
@@ -124,6 +158,15 @@ namespace MinecraftEditor
 				Draw.Line(Width / 2 - 4, Height / 2 + 1, Width / 2 + 5, Height / 2 + 1);
 				Draw.Line(Width / 2, Height / 2 - 4, Width / 2, Height / 2 + 5);
 			}
+			
+			Display.BlendMode = BlendMode.Blend;
+			GL.Color4(Color4.White);
+			GL.Scale(2, 2, 2);
+			Font.Write(4, 4, "Change sky light: F5 and F6\n" +
+			                 "Change minimum light: F7 and F8\n" +
+			                 "Enable/disable fog: F\n" +
+			                 "Enable/disable grid: G");
+			Display.BlendMode = BlendMode.None;
 			
 			SwapBuffers();
 		}

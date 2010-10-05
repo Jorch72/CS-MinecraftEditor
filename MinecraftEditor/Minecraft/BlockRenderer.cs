@@ -81,7 +81,7 @@ namespace MinecraftEditor.Graphics
 			if (chunk == null) return;
 			double blockLight = chunk.GetBlockLight(x, y, z) / 16.0;
 			double skyLight = (chunk.GetSkyLight(x, y, z) / 16.0) * (chunk.World.Light / 16.0);
-			double light = Math.Max(Math.Pow(Math.Max(blockLight, skyLight), 2), 0.1);
+			double light = Math.Max(Math.Pow(Math.Max(blockLight, skyLight), 2), chunk.World.MinimumLight / 16.0);
 			GL.Color3(light, light, light);
 		}
 		static void AdjacentLight(Chunk chunk, int x, int y, int z)

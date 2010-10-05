@@ -50,6 +50,7 @@
     <Compile Include="Graphics\Display.cs" />
     <Compile Include="Graphics\DisplayList.cs" />
     <Compile Include="Graphics\Draw.cs" />
+    <Compile Include="Graphics\Font.cs" />
     <Compile Include="Graphics\FrameBuffer.cs" />
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Minecraft\BlockRenderer.cs" />

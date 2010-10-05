@@ -7,9 +7,13 @@ namespace MinecraftEditor.Graphics
 	{
 		public int ID { get; private set; }
 		
+		public bool Cached {
+			get { return (ID != -1); }
+		}
+		
 		public DisplayList()
 		{
-			ID = GL.GenLists(1);
+			ID = -1;
 		}
 		
 		public void Dispose()
@@ -25,6 +29,7 @@ namespace MinecraftEditor.Graphics
 		}
 		public void Begin(ListMode mode)
 		{
+			if (ID == -1) ID = GL.GenLists(1);
 			GL.NewList(ID, mode);
 		}
 		public void End()

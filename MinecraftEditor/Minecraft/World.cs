@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -6,10 +7,10 @@ using MinecraftEditor.Graphics;
 
 namespace MinecraftEditor.Minecraft
 {
-	public class World
+	public class World : IEnumerable<Chunk>
 	{
 		Dictionary<PointS, Chunk> _chunks = new Dictionary<PointS, Chunk>();
-		byte _light = 15;
+		byte _light = 15, _minLight = 2;
 		
 		public Vector2d RenderOrigin { get; set; }
 		public float RenderRange { get; set; }
@@ -21,15 +22,28 @@ namespace MinecraftEditor.Minecraft
 			get { return _light; }
 			set {
 				if (value == _light) return;
-				_light = Math.Min(value, (byte)16);
-				foreach (Chunk chunk in _chunks.Values)
+				if (value < 0 || value >= 16)
+					throw new ArgumentOutOfRangeException();
+				_light = value;
+				foreach (Chunk chunk in this)
+					chunk.Cached = false;
+			}
+		}
+		public byte MinimumLight {
+			get { return _minLight; }
+			set {
+				if (value == _minLight) return;
+				if (value < 0 || value >= 16)
+					throw new ArgumentOutOfRangeException();
+				_minLight = value;
+				foreach (Chunk chunk in this)
 					chunk.Cached = false;
 			}
 		}
 		
 		public World()
 		{
-			RenderRange = 256;
+			RenderRange = 192;
 		}
 		
 		#region Chunk manipulation
@@ -108,6 +122,17 @@ namespace MinecraftEditor.Minecraft
 		}
 		#endregion
 		
+		#region IEnumerable<Chunk>
+		public IEnumerator<Chunk> GetEnumerator()
+		{
+			return _chunks.Values.GetEnumerator();
+		}
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+		#endregion
+		
 		#region Render
 		public void Render()
 		{
@@ -118,20 +143,22 @@ namespace MinecraftEditor.Minecraft
 				double dist = Math.Sqrt((Math.Pow(RenderOrigin.X + chunk.X * Chunk.Width + Chunk.Width / 2, 2) +
 				                         Math.Pow(RenderOrigin.Y + chunk.Z * Chunk.Height + Chunk.Height / 2, 2)));
 				if (dist > RenderRange) continue;
-				if (chunk.Cached) chunks.Add(chunk);
-				else if (dist < nearestDistance) {
+				if (chunk.ListCached) chunks.Add(chunk);
+				if (!chunk.Cached && dist < nearestDistance) {
 					nearestDistance = dist;
 					nearestUncached = chunk;
 				}
 			}
+			if (nearestUncached != null)
+				chunks.Remove(nearestUncached);
 			
 			Display.Texture = Ressources.TerrainTexture;
-			foreach (Chunk chunk in chunks) RenderChunk(chunk, false);
-			if (nearestUncached != null) RenderChunk(nearestUncached, false);
+			foreach (Chunk chunk in chunks) RenderChunk(chunk, false, false);
+			if (nearestUncached != null) RenderChunk(nearestUncached, true, false);
 			Display.BlendMode = BlendMode.Blend;
 			GL.DepthMask(false);
-			foreach (Chunk chunk in chunks) RenderChunk(chunk, true);
-			if (nearestUncached != null) RenderChunk(nearestUncached, true);
+			foreach (Chunk chunk in chunks) RenderChunk(chunk, false, true);
+			if (nearestUncached != null) RenderChunk(nearestUncached, true, true);
 			GL.DepthMask(true);
 			Display.BlendMode = BlendMode.None;
 		}
@@ -170,12 +197,12 @@ namespace MinecraftEditor.Minecraft
 				GL.PopMatrix();
 			}
 		}
-		void RenderChunk(Chunk chunk, bool transparent)
+		void RenderChunk(Chunk chunk, bool cache, bool transparent)
 		{
 			GL.PushMatrix();
 			GL.Translate(chunk.X * Chunk.Width, 0.0, chunk.Z * Chunk.Height);
-			if (!transparent) chunk.Render();
-			else chunk.RenderTransparent();
+			if (!transparent) chunk.Render(cache);
+			else chunk.RenderTransparent(cache);
 			GL.PopMatrix();
 		}
 		#endregion

@@ -30,6 +30,12 @@ namespace MinecraftEditor.Minecraft
 				_cached2 = value;
 			}
 		}
+		public bool ListCached {
+			get {
+				return (_displayList1.Cached &&
+				        _displayList2.Cached);
+			}
+		}
 		
 		public World World { get; set; }
 		public Chunk Right { get; set; }
@@ -131,10 +137,11 @@ namespace MinecraftEditor.Minecraft
 		#endregion
 		
 		#region Render
-		public void Render()
+		public void Render(bool cache)
 		{
-			if (_cached1) _displayList1.Call();
-			else {
+			if (_cached1 || (_displayList1.Cached && !cache))
+				_displayList1.Call();
+			else if (cache) {
 				_displayList1.Begin();
 				GL.Begin(BeginMode.Quads);
 				for (int x = 0; x < Width; ++x)
@@ -154,10 +161,11 @@ namespace MinecraftEditor.Minecraft
 			}
 		}
 		
-		public void RenderTransparent()
+		public void RenderTransparent(bool cache)
 		{
-			if (_cached2) _displayList2.Call();
-			else {
+			if (_cached2 || (_displayList2.Cached && !cache))
+				_displayList2.Call();
+			else if (cache) {
 				_displayList2.Begin();
 				GL.Begin(BeginMode.Quads);
 				for (int x = 0; x < Width; ++x)

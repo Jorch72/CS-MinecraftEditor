@@ -11,6 +11,8 @@ namespace MinecraftEditor
 		public static Texture TerrainTexture { get; private set; }
 		public static Texture ItemsTexture { get; private set; }
 		
+		public static Texture FontTexture { get; private set; }
+		
 		public static bool Load()
 		{
 			List<string> failed = new List<string>();
@@ -28,6 +30,8 @@ namespace MinecraftEditor
 			catch { TerrainTexture = new Texture(); failed.Add("terrain.png"); }
 			try { ItemsTexture = new Texture("items.png"); }
 			catch { ItemsTexture = new Texture(); failed.Add("items.png"); }
+			try { FontTexture = new Texture("font.png"); }
+			catch { FontTexture = new Texture(); failed.Add("font.png"); }
 			Display.Texture = null;
 		}
 	}

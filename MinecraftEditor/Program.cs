@@ -13,8 +13,9 @@ namespace MinecraftEditor
 			try {
 				if (!LoadAssembly("NBT")) return;
 				if (!LoadAssembly("OpenTK")) return;
-				string path;
+				Console.Clear();
 				Console.WriteLine("Platform: "+Platform.Current);
+				string path;
 				if (Platform.Current == Platform.Windows)
 					path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/.minecraft/";
 				else if (Platform.Current == Platform.Mac)
@@ -94,7 +95,7 @@ namespace MinecraftEditor
 				Console.Write((i * 100 / files.Count)+"%");
 			}
 			Console.Clear();
-			try { window.Run(); }
+			try { window.Run(60.0); }
 			catch (Exception) { window.Dispose(); throw; }
 		}
 		
