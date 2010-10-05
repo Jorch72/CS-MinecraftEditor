@@ -45,6 +45,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FPS.cs" />
     <Compile Include="Graphics\BlendMode.cs" />
     <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Graphics\Display.cs" />
@@ -52,6 +53,7 @@
     <Compile Include="Graphics\Draw.cs" />
     <Compile Include="Graphics\Font.cs" />
     <Compile Include="Graphics\FrameBuffer.cs" />
+    <Compile Include="Graphics\TextAlign.cs" />
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Minecraft\BlockRenderer.cs" />
     <Compile Include="Minecraft\Blocktype.cs" />

@@ -25,8 +25,12 @@ namespace MinecraftEditor.Graphics
 		{
 			int width = 0;
 			foreach (string line in value.Split('\n'))
-				width = Math.Max(width, line.Length * Spacing);
+				width = Math.Max(width, GetLineWidth(value));
 			return width;
+		}
+		int GetLineWidth(string value)
+		{
+			return value.Length * Spacing;
 		}
 		public int GetHeight(string value)
 		{
@@ -35,20 +39,23 @@ namespace MinecraftEditor.Graphics
 			if (value == string.Empty) return 0;
 			return (value.Split('\n').Length * RowSpacing);
 		}
+		
 		public void Write(int x, int y, string value)
+		{
+			Write(x, y, value, new TextAlign(HorAlign.Left, VerAlign.Top));
+		}
+		public void Write(int x, int y, string value, TextAlign align)
 		{
 			if (value == null)
 				throw new ArgumentNullException("value");
 			if (value == string.Empty) return;
-			
 			int w = Texture.Width / Colums;
 			int h = Texture.Height / Rows;
-			
 			Display.Texture = Texture;
 			GL.Begin(BeginMode.Quads);
-			int yy = y;
+			int yy = y - GetHeight(value) * ((int)align.VerAlign + 1) / 2;
 			foreach (string line in value.Split('\n')) {
-				int xx = x;
+				int xx = x - GetWidth(line) * ((int)align.HorAlign + 1) / 2;
 				foreach (char c in line) {
 					int i = (int)c;
 					if (i > Colums * Rows) i = 0;

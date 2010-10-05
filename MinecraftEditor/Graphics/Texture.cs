@@ -15,8 +15,6 @@ namespace MinecraftEditor.Graphics
 		{
 			ID = GL.GenTexture();
 			Display.Texture = this;
-			// Doesn't look like I need this ...
-			// GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 			GL.TexParameter(TextureTarget.Texture2D,
 			                TextureParameterName.TextureMinFilter,
 			                (int)TextureMinFilter.Nearest);

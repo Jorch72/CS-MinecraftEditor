@@ -54,8 +54,8 @@ namespace MinecraftEditor.Graphics
 		
 		public Camera()
 		{
-			MoveSpeed = 15.0f;
-			MouseSpeed = 5.0f;
+			MoveSpeed = 20.0f;
+			MouseSpeed = 6.0f;
 		}
 		
 		public void Update(Window window, double time)

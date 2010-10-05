@@ -87,11 +87,24 @@ namespace MinecraftEditor
 					if (World.MinimumLight > 0) --World.MinimumLight; break;
 				case Key.F8:
 					if (World.MinimumLight < 15) ++World.MinimumLight; break;
+				case Key.F9:
+					if (World.RenderRange > 64) {
+						World.RenderRange -= 32;
+						GL.Fog(FogParameter.FogStart, (World.RenderRange - 48.0f) * 0.75f);
+						GL.Fog(FogParameter.FogEnd, World.RenderRange - 48.0f);
+					} break;
+				case Key.F10:
+					if (World.RenderRange < 640) {
+						World.RenderRange += 32;
+						GL.Fog(FogParameter.FogStart, (World.RenderRange - 48.0f) * 0.75f);
+						GL.Fog(FogParameter.FogEnd, World.RenderRange - 48.0f);
+					} break;
 			}
 		}
 		
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
+			FPS.RenderFrame();
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 			
 			GL.MatrixMode(MatrixMode.Projection);
@@ -161,11 +174,22 @@ namespace MinecraftEditor
 			
 			Display.BlendMode = BlendMode.Blend;
 			GL.Color4(Color4.White);
+			GL.PushMatrix();
 			GL.Scale(2, 2, 2);
-			Font.Write(4, 4, "Change sky light: F5 and F6\n" +
-			                 "Change minimum light: F7 and F8\n" +
-			                 "Enable/disable fog: F\n" +
-			                 "Enable/disable grid: G");
+			Font.Write(4, 4, "Controls:");
+			GL.PopMatrix();
+			Font.Write(16, 40,
+			           "F5/F6 - Sky light: " + World.Light + "\n" +
+			           "F7/F8 - Min. light: " + World.MinimumLight + "\n" +
+			           "F8/F9 - Render range: " + World.RenderRange + "\n" +
+			           "    F - Fog: " + (Fog ? "On" : "Off") + "\n" +
+			           "    G - Grid: " + (Grid ? "On" : "Off") + "\n" +
+			           "  Esc - Exit");
+			Font.Write(16, Height - 16,
+			           "FPS: " + FPS.Count + "\n" +
+			           "Chunks: " + World.ChunksVisible + " / " + World.ChunksInRange + "\n" +
+			           "Total chunks: " + World.ChunksLoaded,
+			           new TextAlign(HorAlign.Left, VerAlign.Bottom));
 			Display.BlendMode = BlendMode.None;
 			
 			SwapBuffers();

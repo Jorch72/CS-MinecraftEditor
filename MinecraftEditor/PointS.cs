@@ -20,7 +20,7 @@ namespace MinecraftEditor
 		}
 		public override int GetHashCode()
 		{
-			return X ^ Y << 4;
+			return X ^ Y << 16;
 		}
 		public override string ToString()
 		{

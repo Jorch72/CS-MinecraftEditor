@@ -13,7 +13,9 @@ namespace MinecraftEditor.Minecraft
 		byte _light = 15, _minLight = 2;
 		
 		public Vector2d RenderOrigin { get; set; }
-		public float RenderRange { get; set; }
+		public int RenderRange { get; set; }
+		public int ChunksVisible { get; set; }
+		public int ChunksInRange { get; set; }
 		
 		public int ChunksLoaded {
 			get { return _chunks.Count; }
@@ -43,7 +45,7 @@ namespace MinecraftEditor.Minecraft
 		
 		public World()
 		{
-			RenderRange = 192;
+			RenderRange = 160;
 		}
 		
 		#region Chunk manipulation
@@ -139,16 +141,19 @@ namespace MinecraftEditor.Minecraft
 			List<Chunk> chunks = new List<Chunk>((int)(Math.PI * Math.Pow(RenderRange / Chunk.Width, 2)));
 			Chunk nearestUncached = null;
 			double nearestDistance = double.MaxValue;
+			ChunksInRange = 0;
 			foreach (Chunk chunk in _chunks.Values) {
 				double dist = Math.Sqrt((Math.Pow(RenderOrigin.X + chunk.X * Chunk.Width + Chunk.Width / 2, 2) +
 				                         Math.Pow(RenderOrigin.Y + chunk.Z * Chunk.Height + Chunk.Height / 2, 2)));
 				if (dist > RenderRange) continue;
+				ChunksInRange++;
 				if (chunk.ListCached) chunks.Add(chunk);
 				if (!chunk.Cached && dist < nearestDistance) {
 					nearestDistance = dist;
 					nearestUncached = chunk;
 				}
 			}
+			ChunksVisible = chunks.Count;
 			if (nearestUncached != null)
 				chunks.Remove(nearestUncached);
 			
