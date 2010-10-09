@@ -37,11 +37,11 @@ namespace MinecraftEditor.Minecraft
 			}
 		}
 		
-		public World World { get; set; }
-		public Chunk Right { get; set; }
-		public Chunk Left { get; set; }
-		public Chunk Front { get; set; }
-		public Chunk Back { get; set; }
+		public World World { get; internal set; }
+		public Chunk Right { get; internal set; }
+		public Chunk Left { get; internal set; }
+		public Chunk Front { get; internal set; }
+		public Chunk Back { get; internal set; }
 		
 		public Chunk(short x, short z)
 		{

@@ -66,6 +66,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Ressources.cs" />
     <Compile Include="Side.cs" />
+    <Compile Include="Target.cs" />
     <Compile Include="Window.cs" />
   </ItemGroup>
   <ItemGroup>

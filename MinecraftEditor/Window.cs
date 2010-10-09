@@ -17,6 +17,7 @@ namespace MinecraftEditor
 		
 		public Camera Camera { get; private set; }
 		public World World { get; private set; }
+		public Target Target { get; private set; }
 		
 		public Window() : base(1152, 864, new GraphicsMode(32, 24, 0, 0), "Minecraft Editor")
 		{
@@ -31,6 +32,7 @@ namespace MinecraftEditor
 				Rotation = new Vector3(0, 90, 0) };
 			
 			Keyboard.KeyDown += KeyDown;
+			Mouse.ButtonDown += MouseButtonDown;
 		}
 		
 		protected override void OnLoad(EventArgs e)
@@ -58,7 +60,6 @@ namespace MinecraftEditor
 			if (!Ressources.Load()) Exit();
 			Font = new Font(Ressources.FontTexture);
 		}
-		
 		protected override void OnResize(EventArgs e)
 		{
 			GL.Viewport(ClientSize);
@@ -69,6 +70,21 @@ namespace MinecraftEditor
 			Camera.Update(this, e.Time);
 		}
 		
+		void MouseButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			if (Target == null) return;
+			switch (e.Button)
+			{
+				case MouseButton.Left:
+					World.SetBlocktype(Target.X, Target.Y, Target.Z, Blocktype.Air);
+					break;
+				case MouseButton.Right:
+					int x, y, z;
+					Target.GetSide(out x, out y, out z);
+					World.SetBlocktype(x, y, z, Blocktype.Rock);
+					break;
+			}
+		}
 		void KeyDown(object sender, KeyboardKeyEventArgs e)
 		{
 			switch (e.Key)
@@ -229,6 +245,7 @@ namespace MinecraftEditor
 				int y = buffer[result+4];
 				int z = buffer[result+5];
 				Side side = (Side)buffer[result+6];
+				Target = new Target(x, y, z, side);
 				Display.Texture = null;
 				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
 				GL.Color4(new Color4(1.0f, 1.0f, 1.0f, 0.4f));
@@ -300,7 +317,7 @@ namespace MinecraftEditor
 						break;
 				}
 				GL.End();
-			}
+			} else Target = null;
 		}
 		
 		void PickMatrix(double x, double y, double width, double height, int[] viewport)

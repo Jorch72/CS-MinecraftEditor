@@ -17,11 +17,11 @@ namespace MinecraftEditor
 				Console.WriteLine("Platform: "+Platform.Current);
 				string path;
 				if (Platform.Current == Platform.Windows)
-					path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/.minecraft/";
+					path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/.minecraft";
 				else if (Platform.Current == Platform.Mac)
-					path = @"~/Library/Application\ Support/minecraft/";
-				else path = "~/.minecraft/";
-				DirectoryInfo saves = new DirectoryInfo(path + "saves/");
+					path = Environment.GetEnvironmentVariable("HOME") + "/Library/Application Support/minecraft";
+				else path = Environment.GetEnvironmentVariable("HOME") + "/.minecraft";
+				DirectoryInfo saves = new DirectoryInfo(path + "/saves");
 				List<DirectoryInfo> worlds = new List<DirectoryInfo>();
 				if (saves.Exists) foreach (DirectoryInfo world in saves.GetDirectories())
 					if (world.GetFiles("level.dat").Length == 1) worlds.Add(world);

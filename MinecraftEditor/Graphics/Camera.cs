@@ -64,17 +64,17 @@ namespace MinecraftEditor.Graphics
 			MouseDevice mouse = window.Mouse;
 			Point center = new Point(window.Width / 2, window.Height / 2);
 			
-			bool camEnabled = mouse[MouseButton.Right];
+			bool camEnabled = window.Focused;
 			if (camEnabled && !MoveEnabled)
 				MousePosition = new Point(mouse.X, mouse.Y);
 			MoveEnabled = camEnabled;
 			MouseEnabled = camEnabled;
 			
-			if (MouseEnabled && _lastMouseEnabled && window.Focused) {
+			if (MouseEnabled && _lastMouseEnabled) {
 				YawSpeed += (mouse.X - center.X) * MouseSpeed * (float)time;
 				PitchSpeed += (mouse.Y - center.Y) * MouseSpeed * (float)time;
 				Cursor.Position = window.PointToScreen(center);
-			} else if (MouseEnabled && !_lastMouseEnabled && window.Focused) {
+			} else if (MouseEnabled && !_lastMouseEnabled) {
 				Cursor.Position = window.PointToScreen(center);
 				Cursor.Hide();
 				_lastMouseEnabled = true;

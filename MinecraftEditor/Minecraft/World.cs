@@ -51,7 +51,8 @@ namespace MinecraftEditor.Minecraft
 		#region Chunk manipulation
 		public Chunk GetChunkAt(int x, int z)
 		{
-			return GetChunk((short)(x / Chunk.Width), (short)(z / Chunk.Height));
+			return GetChunk((short)Math.Floor(x / (double)Chunk.Width),
+			                (short)Math.Floor(z / (double)Chunk.Height));
 		}
 		public Chunk GetChunk(short x, short z)
 		{
@@ -61,6 +62,8 @@ namespace MinecraftEditor.Minecraft
 		}
 		public void SetChunk(Chunk chunk)
 		{
+			if (chunk == null)
+				throw new ArgumentNullException("chunk");
 			Chunk right = GetChunk((short)(chunk.X + 1), chunk.Z);
 			Chunk left  = GetChunk((short)(chunk.X - 1), chunk.Z);
 			Chunk front = GetChunk(chunk.X, (short)(chunk.Z + 1));
@@ -69,17 +72,27 @@ namespace MinecraftEditor.Minecraft
 			if (left  != null) { left.Right = chunk; left.Cached  = false; }
 			if (front != null) { front.Back = chunk; front.Cached = false; }
 			if (back  != null) { back.Front = chunk; back.Cached  = false; }
-			
-			PointS p = new PointS(chunk.X, chunk.Z);
-			if (chunk != null) {
-				_chunks[p] = chunk;
-				chunk.World = this;
-				chunk.Right = right;
-				chunk.Left  = left;
-				chunk.Front = front;
-				chunk.Back  = back;
-				chunk.Cached = false;
-			} else _chunks.Remove(p);
+			_chunks[new PointS(chunk.X, chunk.Z)] = chunk;
+			chunk.World = this;
+			chunk.Right = right;
+			chunk.Left  = left;
+			chunk.Front = front;
+			chunk.Back  = back;
+			chunk.Cached = false;
+		}
+		public void RemoveChunk(Chunk chunk)
+		{
+			if (chunk == null)
+				throw new ArgumentNullException("chunk");
+			Chunk right = GetChunk((short)(chunk.X + 1), chunk.Z);
+			Chunk left  = GetChunk((short)(chunk.X - 1), chunk.Z);
+			Chunk front = GetChunk(chunk.X, (short)(chunk.Z + 1));
+			Chunk back  = GetChunk(chunk.X, (short)(chunk.Z - 1));
+			if (right != null) { right.Left = chunk; right.Cached = false; }
+			if (left  != null) { left.Right = chunk; left.Cached  = false; }
+			if (front != null) { front.Back = chunk; front.Cached = false; }
+			if (back  != null) { back.Front = chunk; back.Cached  = false; }
+			_chunks.Remove(new PointS(chunk.X, chunk.Z));
 		}
 		#endregion
 		
@@ -96,6 +109,8 @@ namespace MinecraftEditor.Minecraft
 			if (y < 0 || y >= Chunk.Depth) return;
 			Chunk chunk = GetChunkAt(x, z);
 			if (chunk == null) return;
+			x = (x % Chunk.Width + Chunk.Width) % Chunk.Width;
+			z = (z % Chunk.Height + Chunk.Height) % Chunk.Height;
 			chunk.SetBlocktype(x, y, z, type);
 			chunk.Cached = false;
 			if (x == Chunk.Width - 1 && chunk.Right != null) chunk.Right.Cached = false;
@@ -115,6 +130,8 @@ namespace MinecraftEditor.Minecraft
 			if (y < 0 || y >= Chunk.Depth) return;
 			Chunk chunk = GetChunkAt(x, z);
 			if (chunk == null) return;
+			x = (x % Chunk.Width + Chunk.Width) % Chunk.Width;
+			z = (z % Chunk.Height + Chunk.Height) % Chunk.Height;
 			chunk.SetData(x, y, z, data);
 			chunk.Cached = false;
 			if (x == Chunk.Width - 1 && chunk.Right != null) chunk.Right.Cached = false;
